@@ -5,35 +5,33 @@ package kingdom.bnlive.in.trainermonitorlive;
  */
 
 public class MergeSheduleUniversity {
-    private String batchCode;
-    private String status;
-    private String trainer_name;
-    private String trainer_contact;
-    UniversityDetailsModel university;
+    private BatchStatusModel statusModel;
+    private TrainerDetailsModel trainerDetailsModel;
+   private UniversityDetailsModel university;
 
     public MergeSheduleUniversity() {
     }
 
-    public MergeSheduleUniversity(String batchCode, String status, UniversityDetailsModel university) {
-        this.batchCode = batchCode;
-        this.status = status;
+    public MergeSheduleUniversity(BatchStatusModel statusModel, TrainerDetailsModel trainerDetailsModel, UniversityDetailsModel university) {
+        this.statusModel = statusModel;
+        this.trainerDetailsModel = trainerDetailsModel;
         this.university = university;
     }
 
-    public String getBatchCode() {
-        return batchCode;
+    public BatchStatusModel getStatusModel() {
+        return statusModel;
     }
 
-    public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode;
+    public void setStatusModel(BatchStatusModel statusModel) {
+        this.statusModel = statusModel;
     }
 
-    public String getStatus() {
-        return status;
+    public TrainerDetailsModel getTrainerDetailsModel() {
+        return trainerDetailsModel;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTrainerDetailsModel(TrainerDetailsModel trainerDetailsModel) {
+        this.trainerDetailsModel = trainerDetailsModel;
     }
 
     public UniversityDetailsModel getUniversity() {
@@ -47,8 +45,8 @@ public class MergeSheduleUniversity {
     @Override
     public String toString() {
         return "MergeSheduleUniversity{" +
-                "batchCode='" + batchCode + '\'' +
-                ", status='" + status + '\'' +
+                "statusModel=" + statusModel +
+                ", trainerDetailsModel=" + trainerDetailsModel +
                 ", university=" + university +
                 '}';
     }
