@@ -56,8 +56,8 @@ public class FragmentRegistration extends Fragment {
         emailText=view.findViewById(R.id.r_email);
         passwordText=view.findViewById(R.id.r_password);
         repasswordText=view.findViewById(R.id.r_repassword);
-        userBtn=view.findViewById(R.id.rtrainer);
-        adminBtn=view.findViewById(R.id.radmin);
+
+
         name=view.findViewById(R.id.editText);
 
         registrationButton=view.findViewById(R.id.r_registerbtn);

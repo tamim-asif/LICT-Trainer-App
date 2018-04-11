@@ -24,25 +24,7 @@
             android:ems="10"
             android:hint="password"
             android:inputType="textPassword" />
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/lbtngroup"
-            android:checkedButton="@+id/ltrainer">
 
-            <RadioButton
-                android:id="@+id/ltrainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Trainer" />
-
-            <RadioButton
-                android:id="@+id/ladmin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Admin" />
-
-        </RadioGroup>
 
         <Button
             android:id="@+id/l_loginBtn"

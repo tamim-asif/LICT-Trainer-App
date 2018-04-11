@@ -181,6 +181,7 @@ public class FragmentDashboard extends Fragment {
                 Snackbar.make(v,"Batch Started at: "+""+hour+" : "+minute+" "+am_pm,Snackbar.LENGTH_LONG).setAction(null,null).show();
                 setStartClicked(true);
                 btnEnd.setVisibility(View.GONE);
+                
                 inpAttendence.setVisibility(View.VISIBLE);
 
             }

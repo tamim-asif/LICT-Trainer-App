@@ -55,9 +55,9 @@ public class FragmentLogin extends Fragment {
         emailText=view.findViewById(R.id.l_email);
         passwordText=view.findViewById(R.id.l_password);
         loginBtn=view.findViewById(R.id.l_loginBtn);
-        trainerBtn=view.findViewById(R.id.ltrainer);
-        adminBtn=view.findViewById(R.id.ladmin);
-        radioGroup=view.findViewById(R.id.lbtngroup);
+
+
+
         mAuth=FirebaseAuth.getInstance();
         context=getActivity().getBaseContext();
         db=FirebaseFirestore.getInstance();
