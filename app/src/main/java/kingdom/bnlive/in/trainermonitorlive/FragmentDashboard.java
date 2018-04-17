@@ -94,6 +94,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
     private TextView attendence;
     private TextView address;
     private TextView statusview;
+    private TextView startTextView;
     private Button btnStart;
     private Button btnEnd;
     private ImageView btnMap;
@@ -199,6 +200,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
         name = sharedPreferences.getString("name", null);
         email = sharedPreferences.getString("email", null);
         role = sharedPreferences.getString("role", null);
+
 //        headerName.setText(""+sharedPreferences.getString("name",null));
 //        headerEmail.setText(""+sharedPreferences.getString("email",null));
 //        headerRole.setText(""+sharedPreferences.getString("role",null));
@@ -330,6 +332,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
         btnStart = view.findViewById(R.id.button2);
         btnMap = view.findViewById(R.id.imageButton);
         inpAttendence = view.findViewById(R.id.editText2);
+        startTextView=view.findViewById(R.id.txtStart);
         btnEnd = view.findViewById(R.id.button3);
         String id = "";
         btnStart.setOnClickListener(new View.OnClickListener() {
@@ -400,7 +403,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
                     } else
                         am_pm = "am";
 
-
+                   // startTextView.setText(hour2+":"+minute+" "+am_pm);
                     // setBatchId(statusview.getText().toString());
 
 
@@ -415,31 +418,52 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
                         //Snackbar.make(v, "Batch Started " + status + " at: " + "" + hour2 + " : " + minute + " " + am_pm, Snackbar.LENGTH_LONG).setAction(null, null).show();
                         intime = hour + ":" + minute;
                        // getDistanceInMiles(p1,new GeoPoint())
-                        new AlertDialog.Builder(getContext())
-                                .setTitle("Warning!")
-                                .setMessage("Are you sure to start this batch?")
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        String dis=distanceText.getText().toString();
+                        if(!dis.equals("")) {
+                            String[] distance = dis.split(" ");
+                            double d=Double.parseDouble(distance[0]);
+                            if (d<=0.5)
+                            {
+                                new AlertDialog.Builder(getContext())
+                                        .setTitle("Warning!")
+                                        .setMessage("Are you sure to start this batch?")
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        //isConfirmed=true;
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                //isConfirmed=true;
 
-                                        updateStatus(status, intime, getBatchId());
-                                        btnStart.setText("End");
+                                                updateStatus(status, intime, getBatchId());
+                                                btnStart.setText("End");
 
-                                        // setStartClicked(true);
-                                        btnEnd.setVisibility(View.GONE);
+                                                // setStartClicked(true);
+                                                btnEnd.setVisibility(View.GONE);
 
-                                        inpAttendence.setVisibility(View.VISIBLE);
-                                        Snackbar.make(v, "Batch " + status, Snackbar.LENGTH_LONG).setAction(null, null).show();
-                                    }
-                                })
-                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Snackbar.make(v, "Batch not started", Snackbar.LENGTH_LONG).setAction(null, null).show();
-                                    }
-                                }).show();
+                                                inpAttendence.setVisibility(View.VISIBLE);
+                                                Snackbar.make(v, "Batch " + status, Snackbar.LENGTH_LONG).setAction(null, null).show();
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Snackbar.make(v, "Batch not started", Snackbar.LENGTH_LONG).setAction(null, null).show();
+                                            }
+                                        }).show();
+
+                            }
+                            else   new AlertDialog.Builder(getContext())
+                                    .setTitle("Warning!")
+                                    .setMessage("Please stay within 0.5 km from university to start this batch")
+
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setCancelable(false).show();
+                        }
 
                     } else {
                         Snackbar.make(v, "Batch not started at this time", Snackbar.LENGTH_LONG).setAction(null, null).show();
@@ -677,7 +701,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
 //                                        btnStart.setVisibility(View.VISIBLE);
 //                                        btnEnd.setVisibility(View.VISIBLE);
                     spinnerClicked(spinner, position, list, mlist);
-                    statusview.setTextColor(getResources().getColor(R.color.colorBlack));
+                   // statusview.setTextColor(getResources().getColor(R.color.colorBlack));
                     String status = statusview.getText().toString();
                     if (status.equals("scheduled")) {
                         btnStart.setVisibility(View.VISIBLE);
@@ -773,7 +797,24 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
         university.setText(""+mUniversity.getUniversity().getUniversity_name());
         location.setText(""+mUniversity.getUniversity().getLocation());
         start.setText(model.getStart());
+        String hour_minute=model.getStart();
+        String[] hm=hour_minute.split(":");
+        String am_pm="";
+        if(Integer.parseInt(hm[0])>=12) {
+            hm[0] = "" + (Integer.parseInt(hm[0]) - 12);
+            am_pm="pm";
+        }
+        else am_pm="am";
+        startTextView.setText(hm[0]+":"+hm[1]+" "+am_pm);
         end.setText(model.getEnd());
+        String[] hm2=model.getEnd().split(":");
+        String am_pm2="";
+        if(Integer.parseInt(hm2[0])>=12) {
+            hm[0] = "" + (Integer.parseInt(hm2[0]) - 12);
+            am_pm2="pm";
+        }
+        else am_pm2="am";
+        end.setText(hm2[0]+":"+hm2[1]+" "+am_pm2);
         attendence.setText("Not Input");
         address.setText(mUniversity.getUniversity().getAddress());
         statusview.setText(model.getStatus());
