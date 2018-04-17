@@ -129,6 +129,7 @@
                     </TableRow>
                     <TableRow
                         android:layout_width="match_parent"
+                        android:layout_gravity="center_horizontal"
                         android:layout_height="match_parent" >
 
                         <TextView
@@ -144,12 +145,7 @@
                             android:layout_height="wrap_content"
                             android:layout_column="2"
                             android:text="TextView" />
-                        <ImageButton
-                            android:id="@+id/imageButton"
-                            android:layout_width="match_parent"
-                            android:layout_column="3"
-                            android:layout_height="wrap_content"
-                            app:srcCompat="@android:drawable/arrow_down_float" />
+
 
                     </TableRow>
                     <TableRow
@@ -172,6 +168,7 @@
                     </TableRow>
                     <TableRow
                         android:layout_width="match_parent"
+                        android:layout_gravity="center_vertical"
                         android:layout_height="match_parent" >
 
                         <TextView
@@ -186,9 +183,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_column="2" />
+                        <ImageButton
+                            android:id="@+id/imageButton"
+                            android:layout_width="match_parent"
+                            android:layout_column="3"
+                            android:layout_height="wrap_content"
+                            
+                            app:srcCompat="@android:drawable/ic_delete" />
                     </TableRow>
                     <TableRow
                         android:layout_width="match_parent"
+                        android:gravity="center_vertical"
                         android:layout_height="match_parent" >
 
                         <TextView
@@ -204,6 +209,12 @@
                             android:layout_height="wrap_content"
                             android:layout_column="2"
                            />
+
+                        <ImageButton
+                            android:id="@+id/imageButton2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@android:drawable/ic_delete" />
                     </TableRow>
                 </TableLayout>
 

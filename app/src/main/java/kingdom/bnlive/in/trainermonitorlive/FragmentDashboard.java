@@ -212,39 +212,64 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
 
     @SuppressLint("MissingPermission")
     public void locationissue() {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_LOW);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
+
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-
-        String provider = locationManager.getBestProvider(criteria, true);
-
-        // Cant get a hold of provider
-        if (provider == null) {
-            Log.v(TAG, "Provider is null");
-            //showNoProvider();
-            return;
-        } else {
-            Log.v(TAG, "Provider: " + provider);
+        String locationProvider = LocationManager.GPS_PROVIDER;
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER )) {
+            locationProvider = LocationManager.NETWORK_PROVIDER;
         }
-        LocationListener locationListener=new MyLocationListener();
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1L, 1f, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,locationListener);
-       // locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 100, 1,locationListener);
-        // connect to the GPS location service
-        if (ActivityCompat.checkSelfPermission(getActivity().getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        Log.w(TAG,"CurrentLocProvider :"+locationProvider);
+
+      Location  location=locationManager.getLastKnownLocation(locationProvider);
+        Log.i(TAG,"Location :"+location);
+        if(location!=null){
+            Log.d(TAG,"Location Lat :"+location.getLatitude());
+            Log.d(TAG,"Location Lat :"+location.getLongitude());
+           String latitude = Double.toString(location.getLatitude());
+          String  longitude = Double.toString(location.getLongitude());
+
+           // txtView.append("\nLatitude : "+latitude+"\n Longitude : "+longitude);
         }
-        Location oldLocation = locationManager.getLastKnownLocation(provider);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1L, 1f, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,this);
+    locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 100, 1,this);
+//        mLocationRequest = LocationRequest.create()
+//                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+//                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+//                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+//        Criteria criteria = new Criteria();
+//        criteria.setAccuracy(Criteria.ACCURACY_LOW);
+//        criteria.setPowerRequirement(Criteria.POWER_LOW);
+//        criteria.setAltitudeRequired(false);
+//        criteria.setBearingRequired(false);
+//        locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+//
+//        String provider = locationManager.getBestProvider(criteria, true);
+//
+//        // Cant get a hold of provider
+//        if (provider == null) {
+//            Log.v(TAG, "Provider is null");
+//            //showNoProvider();
+//            return;
+//        } else {
+//            Log.v(TAG, "Provider: " + provider);
+//        }
+//        LocationListener locationListener=new MyLocationListener();
+//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1L, 1f, locationListener);
+//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,locationListener);
+//       // locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 100, 1,locationListener);
+//        // connect to the GPS location service
+//        if (ActivityCompat.checkSelfPermission(getActivity().getBaseContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getBaseContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            // TODO: Consider calling
+//            //    ActivityCompat#requestPermissions
+//            // here to request the missing permissions, and then overriding
+//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//            //                                          int[] grantResults)
+//            // to handle the case where the user grants the permission. See the documentation
+//            // for ActivityCompat#requestPermissions for more details.
+//            return;
+//        }
+//        Location oldLocation = locationManager.getLastKnownLocation(provider);
 }
     public void onStatusChanged(String s, int i, Bundle bundle) {
         Log.v(TAG, "Status changed: " + s);
@@ -768,7 +793,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
 //Log.d("currentdis","lat1: "+lat1);
 //Log.d("currentdis","lat2: "+lat);
             if (lat1 != 0 && lat != 0) {
-                String dis = "" + String.format("%.2f", getDistanceInMiles(lat1, lon1, lat, lon)) + " metre";
+                String dis = "" + String.format("%.2f", getDistanceInMiles(lat1, lon1, lat, lon)) + " km";
                 distanceText.setText(dis);
                 Log.d("currentdis", "MyCoordinate: " + lat1 + "," + lon1 + " Target: " +targetLocation);
             }
@@ -1035,8 +1060,10 @@ final UniversityDetailsModel umodel=null;
         currentLongitude = location.getLongitude();
 lat1=currentLatitude;
 lon1=currentLongitude;
-latlong.setText(lat1+","+lon1);
-        Toast.makeText(getActivity().getBaseContext(), currentLatitude + " Changed " + currentLongitude + "", Toast.LENGTH_LONG).show();
+        updateDistance();
+//latlong.setText(lat1+","+lon1);
+Log.d("currentdis",currentLatitude + "," + currentLongitude);
+       // Toast.makeText(getActivity().getBaseContext(), currentLatitude + " Changed " + currentLongitude + "", Toast.LENGTH_LONG).show();
 
     }
     private void getLocationPermission() {
