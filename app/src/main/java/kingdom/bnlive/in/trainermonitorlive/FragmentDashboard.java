@@ -121,6 +121,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
     private double currentLongitude;
     private boolean mLocationPermissionGranted;
     double lat1, lon1;
+    private String accessType;
     protected LocationManager locationManager;
     private DecimalFormat df2 = new DecimalFormat(".##");
 
@@ -200,7 +201,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
         name = sharedPreferences.getString("name", null);
         email = sharedPreferences.getString("email", null);
         role = sharedPreferences.getString("role", null);
-
+accessType=sharedPreferences.getString("access",null);
 //        headerName.setText(""+sharedPreferences.getString("name",null));
 //        headerEmail.setText(""+sharedPreferences.getString("email",null));
 //        headerRole.setText(""+sharedPreferences.getString("role",null));
@@ -338,7 +339,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-
+                Log.d("checkAccess",accessType);
                 if (statusview.getText().toString().equals("scheduled")) {
                     Calendar calendar = Calendar.getInstance();
                     int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -361,7 +362,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
                                     startminute = 59;
                             }
                             if (minute >= startminute && minute <= 59) {
-                                status = "started on time";
+                                status = "ongoing";
                                 bstart = true;
                             }
                         }
@@ -413,7 +414,12 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
 //                    if(minute<minute+30)
 //                        status = "ongoing";
 //                }
-
+                    if(accessType.equals("special")&&bstart==false)
+                    {
+                        Log.d("checkAccess",accessType);
+                        status="ongoing";
+                        bstart=true;
+                    }
                     if (bstart == true) {
                         //Snackbar.make(v, "Batch Started " + status + " at: " + "" + hour2 + " : " + minute + " " + am_pm, Snackbar.LENGTH_LONG).setAction(null, null).show();
                         intime = hour + ":" + minute;
@@ -422,7 +428,8 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
                         if(!dis.equals("")) {
                             String[] distance = dis.split(" ");
                             double d=Double.parseDouble(distance[0]);
-                            if (d<=0.5)
+                            Log.d("checkAccess",accessType);
+                            if ((d<=0.5)||accessType.equals("special"))
                             {
                                 new AlertDialog.Builder(getContext())
                                         .setTitle("Warning!")

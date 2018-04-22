@@ -69,7 +69,7 @@ public class FragmentLogin extends Fragment {
             {
                 Intent intent=new Intent(context, TrainerNavActivity.class);
                 startActivity(intent);
-               // getActivity().finish();
+               getActivity().finish();
             }
 
         }
@@ -140,10 +140,13 @@ public class FragmentLogin extends Fragment {
                                 Log.d(TAG, "Successfully get documents. Role: "+documentSnapshot.get("role"));
                                 role=""+documentSnapshot.get("role");
                                 name=""+documentSnapshot.get("name");
+                                String access=""+documentSnapshot.get("access");
                                 SharedPreferences.Editor editor=sharedPreferences.edit();
                                 editor.putString("email",email);
                                 editor.putString("name",name);
                                 editor.putString("role",role);
+                                editor.putString("access",access);
+                                Log.d("checkAccess",access);
                                 editor.commit();
                                 if(role.equals("trainer")){
                                 Intent intent=new Intent(context,TrainerNavActivity.class);

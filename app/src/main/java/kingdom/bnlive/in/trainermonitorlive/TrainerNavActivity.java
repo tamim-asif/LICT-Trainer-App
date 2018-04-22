@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class TrainerNavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -25,6 +26,7 @@ public class TrainerNavActivity extends AppCompatActivity
     private TextView headerRole;
     SharedPreferences sharedPreferences;
     String MyPreferences="monitordb";
+    private String accessType;
     View headerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,21 +63,29 @@ public class TrainerNavActivity extends AppCompatActivity
         headerName.setText(""+sharedPreferences.getString("name",null));
         headerEmail.setText(""+sharedPreferences.getString("email",null));
         headerRole.setText(""+sharedPreferences.getString("role",null));
+        accessType=""+sharedPreferences.getString("access",null);
         navigationView.setNavigationItemSelectedListener(this);
         //select first item from nav items
         navigationView.getMenu().getItem(0).setChecked(true);
         FragmentManager manager=getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.changeLayout,new FragmentDashboard()).commit();
     }
-
+long currenttime;
     @Override
     public void onBackPressed() {
+        if(currenttime>System.currentTimeMillis())
+        {
+            this.finish();
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+
         }
+        currenttime=System.currentTimeMillis()+2000;
+        Toast.makeText(getBaseContext(),"Press again to exit",Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -116,9 +126,12 @@ public class TrainerNavActivity extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.log_out) {
-
-            FragmentManager manager=getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.changeLayout,new BlankFragment()).commit();
+SharedPreferences.Editor editor=sharedPreferences.edit();
+editor.putString("role",null);
+editor.commit();
+            this.finish();
+            Intent intent=new Intent(TrainerNavActivity.this,RegistrationLogin.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_share) {
 
