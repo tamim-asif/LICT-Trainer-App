@@ -121,11 +121,10 @@ long currenttime;
             FragmentDashboard fd=new FragmentDashboard();
             manager.beginTransaction().replace(R.id.changeLayout,fd).commit();
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_activity) {
+            Toast.makeText(getBaseContext(),"Feture not functional yet.",Toast.LENGTH_LONG).show();
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.log_out) {
+        }  else if (id == R.id.log_out) {
 SharedPreferences.Editor editor=sharedPreferences.edit();
 editor.putString("role",null);
 editor.commit();
@@ -134,8 +133,6 @@ editor.commit();
             startActivity(intent);
 
         } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 

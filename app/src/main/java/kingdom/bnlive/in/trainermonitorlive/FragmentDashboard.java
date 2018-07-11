@@ -339,7 +339,7 @@ accessType=sharedPreferences.getString("access",null);
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Log.d("checkAccess",accessType);
+                //Log.d("checkAccess",accessType);
                 if (statusview.getText().toString().equals("scheduled")) {
                     Calendar calendar = Calendar.getInstance();
                     int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -416,7 +416,7 @@ accessType=sharedPreferences.getString("access",null);
 //                }
                     if(accessType.equals("special")&&bstart==false)
                     {
-                        Log.d("checkAccess",accessType);
+                        Log.d("checkAccess",""+accessType);
                         status="ongoing";
                         bstart=true;
                     }
