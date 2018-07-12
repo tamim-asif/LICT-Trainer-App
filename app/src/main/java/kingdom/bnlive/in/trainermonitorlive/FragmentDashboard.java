@@ -1,12 +1,15 @@
 package kingdom.bnlive.in.trainermonitorlive;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,11 +17,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -28,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -38,31 +38,29 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import java.security.Provider;
+import java.io.ByteArrayOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -73,6 +71,12 @@ import static android.content.Context.LOCATION_SERVICE;
 public class FragmentDashboard extends Fragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+    private static final int CAMERA_REQUEST = 1888;
+    FirebaseStorage storage;
+    StorageReference reference;
+    private Button uploadBtn;
+    private ImageView imageView;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
     public Handler handler;
     private Spinner spinner;
     View view;
@@ -124,7 +128,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
     private String accessType;
     protected LocationManager locationManager;
     private DecimalFormat df2 = new DecimalFormat(".##");
-
+    private byte[] data;
     public boolean isConfirmed() {
         return isConfirmed;
     }
@@ -169,18 +173,98 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
             Log.e(TAG, "PROVIDER DISABLED: " + s);
         }
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity().getBaseContext(), "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new
+                        Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            } else {
+                Toast.makeText(getActivity().getBaseContext(), "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+
+    }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            imageView.setImageBitmap(photo);
+
+        }
+    }
+    public void uploadImage()
+    {
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        UploadTask uploadTask = mountainsRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Snackbar.make(view,"Image uploading failed! "+exception,Snackbar.LENGTH_LONG).setAction(null,null).show();
+            Log.d("uploaderror","Error "+exception);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.g
+                //
+                // etMetadata() contains file metadata such as size, content-type, etc.
+                // ...
+                Snackbar.make(view,"Image uploaded successfully!",Snackbar.LENGTH_LONG).setAction(null,null).show();
+            }
+        });
+    }
+    StorageReference mountainsRef;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_dashboard, container, false);
+       uploadBtn=view.findViewById(R.id.btnUpload);
+        imageView = view.findViewById(R.id.imageView1);
+        storage=FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+       // Create a reference to "mountains.jpg"
+         mountainsRef = storageRef.child("mountains.jpg");
+
+// Create a reference to 'images/mountains.jpg'
+        StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
+
+// While the file names are the same, the references point to different files
+        mountainsRef.getName().equals(mountainImagesRef.getName());    // true
+        mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false
+        uploadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                uploadImage();
+            }
+        });
+        Button photoButton = view.findViewById(R.id.button1);
+        photoButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
+            }
+        });
         getLocationPermission();
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getBaseContext())
-                // The next two lines tell the new client that “this” current class will handle connection stuff
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                //fourth line adds the LocationServices API endpoint from GooglePlayServices
-                .addApi(LocationServices.API)
-                .build();
+//        mGoogleApiClient = new GoogleApiClient.Builder(getActivity().getBaseContext())
+//                // The next two lines tell the new client that “this” current class will handle connection stuff
+//                .addConnectionCallbacks(this)
+//                .addOnConnectionFailedListener(this)
+//                //fourth line adds the LocationServices API endpoint from GooglePlayServices
+//                .addApi(LocationServices.API)
+//                .build();
 
         // Create the LocationRequest object
 //        mLocationRequest = LocationRequest.create()
@@ -746,7 +830,7 @@ accessType=sharedPreferences.getString("access",null);
     public void onResume() {
         super.onResume();
         //Now lets connect to the API
-        mGoogleApiClient.connect();
+    //    mGoogleApiClient.connect();
     }
 
     @Override
