@@ -60,6 +60,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -127,6 +128,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
     double lat1, lon1;
     private String accessType;
     protected LocationManager locationManager;
+    String batchName="";
     private DecimalFormat df2 = new DecimalFormat(".##");
     private byte[] data;
     public boolean isConfirmed() {
@@ -199,6 +201,22 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
     }
     public void uploadImage()
     {
+        String date="";
+        Date c = Calendar.getInstance().getTime();
+        System.out.println("Current time => " + c);
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        date = df.format(c);
+        String name=""+batchName+" "+date+" .jpg";
+        StorageReference storageRef=storage.getReference();
+        mountainsRef = storageRef.child(name);
+
+// Create a reference to 'images/mountains.jpg'
+        StorageReference mountainImagesRef = storageRef.child("images/"+name);
+
+// While the file names are the same, the references point to different files
+        mountainsRef.getName().equals(mountainImagesRef.getName());    // true
+        mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false
         Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -232,14 +250,7 @@ public class FragmentDashboard extends Fragment implements GoogleApiClient.Conne
         storage=FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
        // Create a reference to "mountains.jpg"
-         mountainsRef = storageRef.child("mountains.jpg");
 
-// Create a reference to 'images/mountains.jpg'
-        StorageReference mountainImagesRef = storageRef.child("images/mountains.jpg");
-
-// While the file names are the same, the references point to different files
-        mountainsRef.getName().equals(mountainImagesRef.getName());    // true
-        mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -580,6 +591,7 @@ accessType=sharedPreferences.getString("access",null);
                                     updateStatus("completed", outtime, att, getBatchId());
                                     btnStart.setVisibility(View.GONE);
                                     inpAttendence.setVisibility(View.GONE);
+                                    //uploadImage();
                                     Snackbar.make(v, "Batch completed", Snackbar.LENGTH_LONG).setAction(null, null).show();
                                 }
                             })
@@ -913,6 +925,7 @@ accessType=sharedPreferences.getString("access",null);
         UniversityDetailsModel umodel=mUniversity.getUniversity();
         latlong.setText(umodel.getLat_long());
         setBatchId(model.getId());
+        batchName=model.getBatch_code();
         updateDistance();
 
     }
